@@ -73,7 +73,7 @@ plugins_to_install:
 # plugins_to_uninstall
 plugins_to_uninstall:
   - wordpress-seo
-  - imagify
+  - w3-total-cache
 
 # themes_to_install
 themes_to_install:
