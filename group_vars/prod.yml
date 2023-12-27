@@ -1,0 +1,128 @@
+---
+ansible_user: vagrant
+ansible_password: "{{ vault_ansible_password }}"
+
+
+# defaults file for roles
+system_user: vagrant
+compose_project_dir: /home/{{ system_user }}
+
+wp_db_user: tafen_dirane
+wp_db_psw: djombaousoumission
+db_root_psw: somewordpress
+wp_db_name:  eazy_training
+
+wp_version: 5.3.2
+wordpress_webroot: /var/www/html
+wordpress_site_url: http://192.168.99.11
+
+wordpress_directory: "/home/{{ system_user }}/eazytraining"
+
+wordpress_title: wordpress
+wordpress_admin_user: Aurelie
+wordpress_admin_password: 1234
+wordpress_admin_email: nkblondelle@gmail.com
+
+init_script: /home/{{ system_user }}/init.sh
+
+# access key and secret key to access in bucket s3
+aws_access_key: AKIAVG6X43XQ3VXCLAR6 
+aws_secret_key: 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
+backup_db_dir: "global_backup_db"
+
+#name and region of bucket to backup on s3
+s3_bucket_name: "backup-aurelie"
+region: "eu-north-1"
+
+# db backup folder backup
+global_backup_db: "{{ compose_project_dir }}/global_backup_db"
+s3_remote_directory_db: "global_backup_db"
+s3_filename_db: "backup_2023-12-08-120021Z_EAZYTraining_HNXXlsUKhE_global_db.sql"
+
+# global plugins folder backup
+global_backup_plugins: "{{ compose_project_dir }}/global_backup_plugins"
+s3_remote_directory_plugins: "global_backup_plugins"
+s3_filename_plugins: "backup_2023-12-08-122719Z_EAZYTraining_haEVITTfu9_plugins.zip"
+
+# global themes folder backup
+global_backup_themes: "{{ compose_project_dir }}/global_backup_themes"
+s3_remote_directory_themes: "global_backup_themes"
+s3_filename_themes: "backup_2023-12-08-132228Z_EAZYTraining_RuOWL6ErRk_themes.zip"
+
+
+# specific plugins folder backup
+specific_backup_plugins: "{{ compose_project_dir }}/specific_backup_plugins/"
+s3_remote_directory_specific_plugins: "specific_backup_plugins"
+s3_filename_specific_plugins: "backup_2023-12-08-134144Z_EAZYTraining_rhrwTMKhZe_updraftplus_1.23.12.zip"
+
+# specific themes folder backup
+specific_backup_themes: "{{ compose_project_dir }}/specific_backup_themes/"
+s3_remote_directory_specific_themes: "specific_backup_themes"
+s3_filename_specific_themes: "backup_2023-12-09-171502Z_EAZYTraining_7ybgX73bqz_twentytwenty_1.1.zip" 
+
+# site folder backup
+global_backup_site: "{{ compose_project_dir }}/global_backup_site/"
+s3_remote_directory_site: "global_backup_site"
+s3_filename_site: "backup_2023-12-11-154653Z_EAZYTraining_PppBXRbPPy_global.zip"
+
+# plugins_to_install
+plugins_to_install:
+   - wordpress-seo
+   - malcare-security
+
+# plugins_to_uninstall
+plugins_to_uninstall:
+  - wordpress-seo
+  - imagify
+
+# themes_to_install
+themes_to_install:
+  - twentytwenty
+
+# themes_to_uinstall
+themes_to_uninstall:
+  - twentynineteen 
+  # Ajoutez d'autres thèmes à désinstaller ici si nécessaire
+new_theme_to_activate: twentytwenty
+
+# plugin_to_update
+plugin_to_update:
+  plugin_name: contact-form-7 
+  new_version: 5.8.4
+
+# theme_to_update
+theme_to_update:
+  theme_name: "twentytwenty"
+  new_version: 1.0
+
+# restore_db_name
+restore_db_name:
+  restore_pattern: "backup_2023-12-22-175145Z_EAZYTraining_u8Mmus28V3_global_db.sql"
+  restore_files_path: "{{ compose_project_dir }}/s3_db_restore"
+
+# restore_file_name
+restore_file_name:
+  restore_pattern: "backup_2023-12-22-070720Z_EAZYTraining_xFE0ALGqWg_global.zip" 
+  restore_files_path: "{{ compose_project_dir }}/global_backup_site"
+
+# restore_plugins_name
+restore_plugins_name:
+  restore_pattern: "*"
+  restore_files_path: "{{ compose_project_dir }}/global_backup_plugins/backup_2023-12-22-044520Z_EAZYTraining_dX9f6mzTAy_plugins/"
+
+# restore_themes_name
+restore_themes_name:
+  restore_pattern: "*"
+  restore_files_path: "{{ compose_project_dir }}/global_backup_themes/backup_2023-12-22-045008Z_EAZYTraining_dZ25NhgamH_themes/"
+
+# specific_plugin_name_restore
+specific_plugin_name_restore:
+  restore_pattern: "backup_2023-12-22-165907Z_EAZYTraining_I6B36n43OP_contact-form-7_5.8.2.zip"
+  restore_files_path: "{{ compose_project_dir }}/specific_backup_plugins"
+
+# specific_theme_name_restore
+specific_theme_name_restore:
+  restore_pattern: "backup_2023-12-22-172456Z_EAZYTraining_vVyqa8cu45_twentytwenty_1.0.zip"
+  restore_files_path: "{{ compose_project_dir }}/specific_backup_themes"
+
+
