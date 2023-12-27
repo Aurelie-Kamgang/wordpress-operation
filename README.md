@@ -1,495 +1,583 @@
-# Automatisation des actions de gestion d'un site wordpress avec Ansible
+# Automating wordpress site management actions with Ansible
 
-Objectif:
+Objective:
 
-Automatiser les actions primaires sur le site EAZYtraining
+Automate primary actions on the EAZYtraining site.
 
-Prérequis: 
+Prerequisites: 
 
-- Installé chez le client git; zip; python3.8; wp-cli
-- Installé dans le conteneur wordpress wp-cli
+- Installed on client git; zip; python3.8; wp-cli
+- Installed in wp-cli wordpress container
 
 ## Version 1
 
-- Installation et activation des plugins et thèmes en utilisant wp-cli et les rôles ansibles
-- Désinstallation et désactivation des plugins et thèmes en utilisant wp-cli et les rôles ansibles
+- Install and activate plugins and themes using wp-cli and ansibles roles
+- Uninstall and deactivate plugins and themes using wp-cli and ansibles roles
 
-### Procédure d'exécution:
+### Procedure:
 
- 1. Déploiement de l'application EAZYtraining:
-	  - Git cloner le repos
-      - Se rendre dans le repertoire: `cd /home/user/Role-wordpress`
-      - Taper la commande: 
+ 1. Deploy EAZYtraining application:
+	  - Git clone repos
+      - Go to the directory: `cd /home/user/Role-wordpress`.
+      - Type the command: 
       `ansible-playbook -i hosts.yml --ask-vault-pass -vvv wordpress_operations.yml --tags deploy`
 
-**NB: BECOME password=${user_passord} dans mon cas c'est vagrant et Vault password=vagrant qui est le password définit lors de la création de la vault key**
+**NB: BECOME password=${user_passord} in my case it's vagrant and Vault password=vagrant which is the password defined when creating the vault key**.
 
- 2. Installation et activation des plugins et thèmes
+ 2. Installing and activating plugins and themes
       
-      - Se rendre dans le fichier :
+      - Go to the :
    
-         `vi roles/wordpress/vars/plugins_to_install.yml `
- ou
-          `vi roles/wordpress/vars/themes_to_install.yml `
+         `vi group_vars/prod.yml`
 
-           Pour spécifier la liste des plugins et thèmes à installer
+        in the form:
+        
+        `plugins_to_install:`
+	   wordpress-seo`
+	   malcare-security`
+
+           To specify the list of plugins and themes to install
            
-      -   Se rendre dans le repertoire: `/home/user/Role-wordpress`
-      - Taper la commande:
+      - Go to the directory: `/home/user/Role-wordpress`.
+      - Type the command:
       
          `ansible-playbook -i hosts.yml --ask-vault-pass -vvv wordpress_operations.yml --tags install_plugins`
-ou
+
+
           `ansible-playbook -i hosts.yml --ask-vault-pass -vvv wordpress_operations.yml --tags install_themes`
 
-      - Tester l'installation des plugins et thèmes chez le client:
+      - Test the installation of plugins and themes on the customer's site:
 
-        `wp plugin list  --allow-root --ssh=docker:wordpress`
-ou
-        `wp theme list  --allow-root --ssh=docker:wordpress`
+        `wp plugin list --allow-root --ssh=docker:wordpress`
+or
+        `wp theme list --allow-root --ssh=docker:wordpress`
 
 
-3. Avoir la liste des plugins installés:
+4. Get the list of installed plugins:
 
-      -   Se rendre dans le repertoire: `cd /home/user/Role-wordpress`
-      - Taper la commande: 
+      - Go to the directory: `cd /home/user/Role-wordpress`.
+      - Type the command: 
 
-		`ansible-playbook -i hosts.yml --ask-vault-pass -vvv   wordpress_operations.yml --tags plugins_list`
+		`ansible-playbook -i hosts.yml --ask-vault-pass -vvv wordpress_operations.yml --tags plugins_list`
 
-      -  Aller chez le client ansible ouvrir le fichier: `plugins_list.json` Pour consulter la liste des plugins installés
+      - Go to the ansible client and open the file: `plugins_list.json` To consult the list of installed plugins
       
-5.  Désinstallation des plugins et thèmes
+5.  Uninstalling plugins and themes
 
-      - Se rendre dans le fichier :
+      - Go to file :
    
-         `vi roles/wordpress/vars/plugins_to_uninstall.yml `
- ou
-          `vi roles/wordpress/vars/themes_to_uninstall.yml `
+         `vi group_vars/prod.yml `
+        
+        in the form:
+        
+        `plugins_to_uninstall:`
+	  wordpress-seo`
+	  `- imagify`
 
-           Pour spécifier la liste des plugins ou thèmes à désinstaller
+           To specify the list of plugins or themes to be uninstalled
            
-      -   Se rendre dans le repertoire: `/home/user/Role-wordpress`
-      - Taper la commande: 
+      - Go to the directory: `/home/user/Role-wordpress`.
+      - Type the command: 
       
          `ansible-playbook -i hosts.yml --ask-vault-pass -vvv wordpress_operations.yml --tags uninstall_plugins`
-ou
+or
           `ansible-playbook -i hosts.yml --ask-vault-pass -vvv wordpress_operations.yml --tags uninstall_themes`
 
 
-##  Version 2
+## Version 2
 
-- Backup globale en local (avec une organisation de dossier bien spécifique)
-- Restauration globale en local
+- Local global backup (with specific folder organization)
+- Local global restore
 
-### Procédure d'exécution:
+### Execution procedure:
 
-#### Backup Globale en local
+#### Global local backup
 
-   Se rassurer que les repertoires suivant sont créés chez le client: 
+   Ensure that the following directories are created on the customer's premises: 
          global_backup_site; global_backup_db; global_backup_plugins; global_backup_themes.
 
-1. Backup globale en local (de tout le site)
+1. Local global backup (of the entire site)
          
-      -   Se rendre dans le repertoire: `cd /home/user/Role-wordpress`
-      - Taper la commande: 
+      - Go to directory: `cd /home/user/Role-wordpress`.
+      - Type the command: 
       
          `ansible-playbook -i hosts.yml --ask-vault-pass -vvv wordpress_operations.yml --tags global_backup` 
          
-      - Se rendre chez le client dans le repertoire : `ls /home/user/global_backup_site/` 
-    pour consulter le fichier globale zippé sous cette forme: 
+      - Go to the customer's directory: `ls /home/user/global_backup_site/` 
+    to view the zipped global file in this form: 
     `backup_2023-11-29-150808Z_EAZYTraining_RJ80HnU9RO_global.zip`
 
-2. Backup de la base de donnée
+2. Database backup
 
-      -   Se rendre dans le repertoire: `ls /home/user/Role-wordpress`
-      - Taper la commande: 
+      - Go to the directory: `ls /home/user/Role-wordpress`.
+      - Type the command: 
       
          `ansible-playbook -i hosts.yml --ask-vault-pass -vvv wordpress_operations.yml --tags global_backup_db` 
          
-      - Se rendre chez le client dans le repertoire : `ls /home/user/global_backup_db/` 
-    pour consulter le fichier globale zippé sous cette forme: 
+      - Go to the customer's directory: `ls /home/user/global_backup_db/` 
+    to view the zipped global file in this form: 
     `backup_2023-11-29-150808Z_EAZYTraining_RJ80HnU9RO_global_db.sql`
 
-3. Backup globale de tous les plugins :
+3. Global backup of all plugins :
 
-      -   Se rendre dans le repertoire: `/home/user/Role-wordpress`
-      - Taper la commande: 
+      - Go to directory: `/home/user/Role-wordpress`.
+      - Type the command: 
       
-         `ansible-playbook -i hosts.yml --ask-vault-pass -vvv wordpress_operations.yml --tags plugins_backup` 
-         
-      - Se rendre chez le client dans le repertoire : `ls /home/user/global_backup_plugins` 
-    pour consulter le fichier globale zippé sous cette forme: 
-    `backup_2023-11-29-151045Z_EAZYTraining_JJlXbmRtxY_plugins.zip`
+         `ansible-playbook -i hosts.yml --ask-vault-pass -vvv wordpress_operations.yml --tags plugins_backup`
 
-4. Backup globale de tous les themes :
+       
+      - Go to the customer's directory: `ls /home/user/global_backup_plugins`. 
+    to view the zipped global file in this form: 
+    `backup_2023-11-29-151045Z_EAZYTraining_JJlXbmRtxY_plugins/`
 
-      -   Se rendre dans le repertoire: `cd /home/user/Role-wordpress`
-      - Taper la commande: 
+4. Global backup of all themes :
+
+      - Go to directory: `cd /home/user/Role-wordpress`
+      - Type the command: 
       
          `ansible-playbook -i hosts.yml --ask-vault-pass -vvv wordpress_operations.yml --tags themes_backup` 
          
-      - Se rendre chez le client dans le repertoire : `ls /home/user/global_backup_themes` 
-    pour consulter le fichier globale zippé sous cette forme: 
-    `backup_2023-11-29-151307Z_EAZYTraining_DivZbqEMYk_themes.zip`
+      - Go to the customer's directory: `ls /home/user/global_backup_themes` to view the zipped global file. 
+    to view the zipped global file in this form: 
+    `backup_2023-11-29-151307Z_EAZYTraining_DivZbqEMYk_themes/`
     
-#### Restauration Globale en locale
+#### Global restoration in local
 
-   Se rassurer que les repertoires suivant sont créés chez le client: 
+   Make sure the following directories are created on the customer's site: 
          global_backup_site; global_backup_db; global_backup_plugins; global_backup_themes.
 
-1. Restauration  globale en local (de tout le site)
+1. Local global restore (of the entire site)
 
-      - Se rendre dans le fichier :
+      - Go to :
    
-         `vi roles/wordpress/vars/restore_file_name.yml`
+         `vi group_vars/prod.yml`
 
-           Pour spécifier le fichier archivé du site à restaurer et le repertoire en local où il est situé (`global_backup_site` dans notre cas):
+           To specify the archived site file to be restored and the local directory where it is located (`global_backup_site` in our case):
            
-           `backup_pattern: "backup_2023-12-11-154653Z_EAZYTraining_PppBXRbPPy_global.zip"
-backup_files_path: "{{ compose_project_dir }}/global_backup_site/"`
+           `backup_pattern: "backup_2023-12-11-154653Z_EAZYTraining_PppBXRbPPy_global.zip"`
+           `backup_files_path: "{{ compose_project_dir }}/global_backup_site/"`
            
-      -   Se rendre dans le repertoire: `/home/user/Role-wordpress`
-      - Taper la commande: 
+      - Go to the directory: `/home/user/Role-wordpress`.
+      - Type the command:
       
          `ansible-playbook -i hosts.yml --ask-vault-pass -vvv wordpress_operations.yml --tags global_restore`
 
-2. Restauration  de la base de données en local
+2. Restoring the database locally
 
-      - Se rendre dans le fichier :
+      - Go to file :
    
-         `vi roles/wordpress/vars/restore_db_name.yml`
+         `vi group_vars/prod.yml`
 
-           Pour spécifier le fichier  archivé de la base de données à restaurer et le repertoire en local où il est situé (`global_backup_db` dans notre cas):
+           To specify the archived database file to be restored and the local directory where it is located (`global_backup_db` in our case):
            
-           `restore_pattern: "backup_2023-12-08-120021Z_EAZYTraining_HNXXlsUKhE_global_db.sql"
-restore_files_path: "{{ compose_project_dir }}/global_backup_db"`
+           `restore_pattern: "backup_2023-12-08-120021Z_EAZYTraining_HNXXlsUKhE_global_db.sql"`
+           `restore_files_path: "{{ compose_project_dir }}/global_backup_db"`
            
-      -   Se rendre dans le repertoire: `/home/user/Role-wordpress`
-      - Taper la commande: 
+      - Go to the directory: `/home/user/Role-wordpress`.
+      - Type the command: 
       
          `ansible-playbook -i hosts.yml --ask-vault-pass -vvv wordpress_operations.yml --tags global_restore_db`
 
-3. Restauration globale de tous les plugins en locale
+3. Global restoration of all plugins locally
 
- Se rendre dans le fichier :
+ Go to file :
    
-   `vi roles/wordpress/vars/restore_plugins_name.yml`
+   `vi group_vars/prod.yml`
    
-Pour spécifier le fichier  archivé du site à restaurer et le repertoire en local où il est situé (`global_backup_plugins` dans notre cas):    
+To specify the archived site file to be restored and the local directory where it is located (`global_backup_plugins` in our case):    
 
 `restore_pattern: "backup_2023-12-12-152806Z_EAZYTraining_8dd5OjIj9H_plugins.zip"
-restore_files_path: "{{ compose_project_dir }}/global_backup_plugins"`    
+ restore_files_path: "{{ compose_project_dir }}/global_backup_plugins"`    
 
-   -   Se rendre dans le repertoire: `/home/user/Role-wordpress`
-   - Taper la commande: 
+   - Go to the directory: `/home/user/Role-wordpress`.
+   - Type the command: 
       
-         `ansible-playbook -i hosts.yml --ask-vault-pass -vvv wordpress_operations.yml --tags global_restore_plugins`
+         `ansible-playbook -i hosts.yml --ask-vault-pass -vvv wordpress_operations.yml --tags global_restore_plugins`.
 
-4. Restauration globale de tous les themes en locale
+4. Global restoration of all local themes
 
- Se rendre dans le fichier :
+ Go to file :
    
-   `vi roles/wordpress/vars/restore_themes_name.yml`
+   `vi group_vars/prod.yml`
 
-Pour spécifier le fichier  archivé du site à restaurer et le repertoire en local où il est situé (`global_backup_themes` dans notre cas): 
+To specify the archived site file to be restored and the local directory where it is located (`global_backup_themes` in our case): 
 
 `restore_pattern: "backup_2023-12-08-132228Z_EAZYTraining_RuOWL6ErRk_themes.zip"
-restore_files_path: "{{ compose_project_dir }}/global_backup_themes"`
+ restore_files_path: "{{ compose_project_dir }}/global_backup_themes"`
 
-   -   Se rendre dans le repertoire: `/home/user/Role-wordpress`
-   - Taper la commande: 
+   - Go to the directory: `/home/user/Role-wordpress`.
+   - Type the command: 
       
          `ansible-playbook -i hosts.yml --ask-vault-pass -vvv wordpress_operations.yml --tags global_restore_themes`
 
-##  Version 3
+## Version 3
 
-- Mise à jour et Backup plugin spécifique et theme specifique
-- restauration plugin spécifique (rollback)
+- Update and Backup specific plugin and theme
+- restore specific plugin (rollback)
 
-### Procédure d'exécution
+### Execution procedure
 
-a. Mise à jour d'un plugin spécifique
+a. Updating a specific plugin
 
 **NB:** 
 
-**- Lors de la mise à jour d'un plugin spécifique le backup de ce plugin là est effectué en arrière plan en local et sur le bucket de manière automatique.**
+**- When a specific plugin is updated, it is automatically backed up locally in the background and on the bucket.
 
-**-Au même moment, un fichier yaml est créé automatiquement portant le nom du plugin à l'intérieur du quel nous avons les informations sur le nom du plugin, la version avant la mise à jour ; le nom du plugin, la version après la mise à jour et enfin la date à la quelle le plugins a été mise à jour**
+**-At the same time, a yaml file is automatically created bearing the name of the plugin, inside which we have information on the name of the plugin, the version before the update; the name of the plugin, the version after the update and finally the date on which the plugin was updated**.
 
-**exemple:** 
+**example:** 
 
 **![](https://lh7-us.googleusercontent.com/DyCF7nxO9Go5B6jJzvnYEuoNtksRD2YQ4IlJHsgHM_ub8jop6z4KjymzIbpEusx7_AAyOkW8eC_1VnJCQE8vQiUwGCvt-SIxb5166fWKoTLMEeRrD4qE6jfOe-6pJZU63-g8o-V2rqw6LdS9mCVCsDI)**
 
-  - Se rendre dans le fichier : `vi roles/wordpress/vars/plugin_to_update.yml`
-  pour spécifier le nom du plugin à mettre à jour et sa nouvelle version
+  - Go to the file: `vi group_vars/prod.yml` and specify the plugin name and new version.
+  to specify the name of the plugin to be updated and its new version
+
+  in the form:
   
-  -  Mettre à jour le plugin
+  `plugin_to_update:
+	  plugin_name: contact-form-7 
+	  new_version: 5.8.4`
+  
+  - Update plugin
         
-        - Consulté la version du plugin actuelle avec la commande:
-        `wp plugin get nom_plugin --allow-root --ssh=docker:wordpress`
+        - Consult the current plugin version with the command:
+        `wp plugin get plugin_name --allow-root --ssh=docker:wordpress`
         
-        -   Se rendre dans le repertoire: `/home/user/Role-wordpress`
-      - Taper la commande: 
+        - Go to the directory: `/home/user/Role-wordpress`.
+      - Type the command: 
          `ansible-playbook -i hosts.yml --ask-vault-pass -vvv wordpress_operations.yml --tags update_plugin`
          
-     - Consulté à nouveau la version du plugin avec la commande:
-        `wp plugin get nom_plugin --allow-root --ssh=docker:wordpress`
-     - Aller chez le client dans le fichier :  `vi specific_backup_plugins/nom_plugin.yaml`
-     pour avoir les informations de mise à jour du plugin
-     - Consulter chez le client le repertoire suivant pour voire le fichier archivé du plugin avant sa mise à jour: `ls specific_backup_plugins/`
+     - Check the plugin version again with the command:
+       
+        `wp plugin get plugin_name --allow-root --ssh=docker:wordpress`
+       
+     - Go to the client file: `vi specific_backup_plugins/plugin_name.yaml` to get the update information.
+       
+     for plugin update information
+     
+     - Consult the following directory on the customer's site to view the plugin's archived file before updating: `ls specific_backup_plugins/`.
 
-**Remarque: Pour faire le backup et la restauration  d'un plugin spécifique indépendamment de sa mise à jour suivre les étapes ci-après:**
 
-#### Backup spécifiques
+**Note: To back up and restore a specific plugin independently of its update, follow the steps below:**.
 
-a. Backup du plugin spécifique en local
-   - Se rendre dans le fichier : `vi roles/wordpress/vars/plugin_to_update.yml`
-  pour spécifier le nom du plugin à backuper et version
+#### Specific backups
+
+a. Local backup of a specific plugin
+   - Go to the file: `vi group_vars/prod.yml`.
+     
+     in the form:
+     
+       `plugin_to_update:
+	  plugin_name: contact-form-7 
+	  new_version: 5.8.4`
+
+  to specify the name of the plugin to backup and its version
   
--  Se rendre dans le repertoire: `/home/user/Role-wordpress`
-- Taper la commande: 
+- Go to the directory: `/home/user/Role-wordpress`.
+- Type the command: 
          `ansible-playbook -i hosts.yml --ask-vault-pass -vvv wordpress_operations.yml --tags plugin_specific_backup`
 
-b. Backup du plugin spécifique sur le bucket s3
-   - Se rendre dans le fichier : `vi roles/wordpress/default/main.yml`
-  pour spécifier chez le client le repertoire des plugins spéciques à synchroniser sur le bucket:
+
+b. Backing up the specific plugin on the s3 bucket
+   - Go to the file: `vi group_vars/prod.yml` and specify the customer's directory.
+  to specify the customer's directory for specific plugins to be synchronized on the bucket:
   `specific_backup_plugins: "{{ compose_project_dir }}/specific_backup_plugins/"`
   
--  Se rendre dans le repertoire: `/home/user/Role-wordpress`
-- Taper la commande: 
+- Go to the directory: `/home/user/Role-wordpress`.
+- Type the command: 
          `ansible-playbook -i hosts.yml --ask-vault-pass -vvv wordpress_operations.yml --tags s3_specific_plugins_backup
   
-  #### Restauration spécifique
+  #### Specific restore
  
-a. Restauration du plugin spécifique en local
-   - Se rendre dans le fichier : `vi roles/wordpress/vars/specific_plugin_name_restore.yml`
+a. Restore specific plugin locally
+   - Go to file: `vi group_vars/prod.yml`.
+
+
+  in the form:
   
-  pour spécifier le nom de l'archive  du plugin à restaurer et le repertoire où il est situé.
+  `specific_plugin_name_restore:
+  restore_pattern: "backup_2023-12-22-165907Z_EAZYTraining_I6B36n43OP_contact-form-7_5.8.2.zip"
+  restore_files_path: "{{ compose_project_dir }}/specific_backup_plugins"`
+
+
+  to specify the name of the plugin archive to be restored and the directory where it is located.
   
--  Se rendre dans le repertoire: `/home/user/Role-wordpress`
-- Taper la commande: 
+- Go to directory: `/home/user/Role-wordpress`.
+- Type the command: 
          `ansible-playbook -i hosts.yml --ask-vault-pass -vvv wordpress_operations.yml --tags plugin_specific_restore`
 
-b. Restauration du plugin spécifique depuis le bucket s3
-   - Télécharger l'archive du plugin à restaurer depuis le bucket:
-	 - Se rendre dans le fichier: `vi roles/wordpress/default/main.yml` pour spécifier le nom du fichier archivé du plugin à télécharger:
-`s3_filename_specific_plugins: "backup_2023-12-08-134144Z_EAZYTraining_rhrwTMKhZe_updraftplus_1.23.12.zip"`
 
-     - Et fichier sera stocker dans le repertoire `s3_specific_plugin_restore` chez le client
+b. Restoring the specific plugin from the s3 bucket
+   - Download the plugin archive to be restored from the bucket:
+	 - Go to the file: `vi group_vars/prod.yml` to specify the name of the archived plugin file to download:
+     
+          `s3_filename_specific_plugins: "backup_2023-12-08-134144Z_EAZYTraining_rhrwTMKhZe_updraftplus_1.23.12.zip"`
+
+     - And the file will be stored in the `s3_specific_plugin_restore` directory on the customer's site.
   
--  Se rendre dans le repertoire: `/home/user/Role-wordpress`
-- Taper la commande: 
+- Go to directory: `/home/user/Role-wordpress`.
+- Type the command: 
          `ansible-playbook -i hosts.yml --ask-vault-pass -vvv wordpress_operations.yml --tags restore_specific_plugins_s3`
 
-b. Mise à jour d'un theme spécifique
+
+b. Updating a specific theme
 
 **NB:** 
 
-**- Lors de la mise à jour d'un thème spécifique le backup de ce thème là est effectué en arrière plan en local et sur le bucket de manière automatique.**
 
-**-Au même moment, un fichier yaml est créé automatiquement portant le nom du thème à l'intérieur du quel nous avons les informations sur le nom du thème, la version avant la mise à jour ; le nom du thème, la version après la mise à jour et enfin la date à la quelle le thème a été mise à jour**
+**- When updating a specific theme, the theme is automatically backed up locally in the background and on the bucket.
 
-**exemple:** 
+
+**-At the same time, a yaml file is automatically created with the theme name, containing information on the theme name, the version before the update, the theme name, the version after the update and the date on which the theme was updated**.
+
+
+**example:** 
 
 **![](https://lh7-us.googleusercontent.com/MrW3vpZAGURftPtWLF_I9YpFLgK9gLrjqjZkGB79XFQdA88aL3HvGcW2nw4pKKhf4eZ9_Tv-inGRBcJz1qNUwQZiP7C7ACDsltVVznM7a5wdaJxOZWLhMh5TVqrdVdiDm6Pa5jkWNi-Z9c3P1UtgGcc)**
 
-  - Se rendre dans le fichier : `vi roles/wordpress/vars/theme_to_update.yml`
-  pour spécifier le nom du theme à mettre à jour et sa nouvelle version
+  - Go to file: `vi group_vars/prod.yml`
+    
+    in the form:
+
+    `theme_to_update:
+	  theme_name: "twentytwenty"
+	  new_version: 1.0`
+
+  to specify the name of the theme to be updated and its new version
   
-  -  Mettre à jour le theme
+  - Update theme
         
-        - Consulté la version du theme actuelle avec la commande:
+        - Check the current theme version with the command:
         `wp theme get nom_plugin --allow-root --ssh=docker:wordpress`
         
-        -   Se rendre dans le repertoire: `/home/user/Role-wordpress`
-      - Taper la commande: 
+        - Go to the directory: `/home/user/Role-wordpress`.
+      - Type the command: 
          `ansible-playbook -i hosts.yml --ask-vault-pass -vvv wordpress_operations.yml --tags update_theme`
          
-     - Consulté à nouveau la version du plugin avec la commande:
-        `wp theme get nom_plugin --allow-root --ssh=docker:wordpress`
-     - Aller chez le client dans le fichier :  `vi specific_backup_themes/nom_theme.yaml`
-     pour avoir les informations de mise à jour du theme
-     - Consulter chez le client le repertoire suivant pour voire le fichier archivé du theme avant sa mise à jour: `ls specific_backup_themes/`
+     - Check the plugin version again with the command:
+       
+        `wp theme get plugin_name --allow-root --ssh=docker:wordpress`
+       
+     - Go to the client file: `vi specific_backup_themes/nom_theme.yaml` to get the update information.
+     for theme update information
 
-**Remarque: Pour faire le backup et la restauration  d'un theme spécifique indépendamment de sa mise à jour suivre les étapes ci-après:**
 
-#### Backup spécifiques
+     - Go to the following customer directory to view the theme archive before updating: `ls specific_backup_themes/`.
 
-a. Backup du theme spécifique en local
-   - Se rendre dans le fichier : `vi roles/wordpress/vars/theme_to_update.yml`
-  pour spécifier le nom du theme à backuper et version
-  
--  Se rendre dans le repertoire: `/home/user/Role-wordpress`
-- Taper la commande: 
+**Note: To backup and restore a specific theme independently of its update, follow the steps below:**.
+
+#### Specific backups
+
+a. Backing up a specific theme locally
+   - Go to: `vi group_vars/prod.yml` file
+     
+     in the form:
+     
+    `theme_to_update:
+	  theme_name: "twentytwenty
+	  new_version: 1.0`
+
+  to specify the name of the theme to backup and version
+
+  - Go to the directory: `/home/user/Role-wordpress`.
+- Type the command: 
          `ansible-playbook -i hosts.yml --ask-vault-pass -vvv wordpress_operations.yml --tags theme_specific_backup`
 
-b. Backup du theme spécifique sur le bucket s3
-   - Se rendre dans le fichier : `vi roles/wordpress/default/main.yml`
-  pour spécifier chez le client le repertoire des plugins spéciques à synchroniser sur le bucket:
+b. Backing up the specific theme on the s3 bucket
+   - Go to: `vi group_vars/prod.yml` file
+     
+  to specify the customer's directory for specific plugins to be synchronized on the bucket:
   `specific_backup_themes: "{{ compose_project_dir }}/specific_backup_themes/"`
   
--  Se rendre dans le repertoire: `/home/user/Role-wordpress`
-- Taper la commande: 
+- Go to the directory: `/home/user/Role-wordpress`.
+- Type the command: 
          `ansible-playbook -i hosts.yml --ask-vault-pass -vvv wordpress_operations.yml --tags s3_specific_themes_backup`
   
-  #### Restauration spécifique
+  #### Specific restore
  
-a. Restauration du plugin spécifique en local
-   - Se rendre dans le fichier : `vi roles/wordpress/vars/specific_theme_name_restore.yml`
+a. Restoring the specific plugin locally
+   - Go to file: `vi group_vars/prod.yml`
+     
+     in the form:
+     
+     `specific_theme_name_restore:
+	  restore_pattern: "backup_2023-12-22-172456Z_EAZYTraining_vVyqa8cu45_twentytwenty_1.0.zip"
+	  restore_files_path: "{{ compose_project_dir }}/specific_backup_themes
   
-  pour spécifier le nom de l'archive  du theme à restaurer et le repertoire où il est situé.
+  to specify the name of the theme archive to restore and the directory where it is located.
   
--  Se rendre dans le repertoire: `/home/user/Role-wordpress`
-- Taper la commande: 
+- Go to directory: `/home/user/Role-wordpress`.
+- Type the command: 
          `ansible-playbook -i hosts.yml --ask-vault-pass -vvv wordpress_operations.yml --tags theme_specific_restore`
 
-b. Restauration du theme spécifique depuis le bucket s3
-   - Télécharger l'archive du theme à restaurer depuis le bucket:
-	 - Se rendre dans le fichier: `vi roles/wordpress/default/main.yml` pour spécifier le nom du fichier archivé du plugin à télécharger:
-`s3_filename_specific_themes: "backup_2023-12-09-171502Z_EAZYTraining_7ybgX73bqz_twentytwenty_1.1.zip"`
+b. Restore specific theme from s3 bucket
 
-     - Et ce fichier sera stocker dans le repertoire `s3_specific_theme_restore` chez le client
+   - Download the theme archive to restore from the bucket:
+	 - Go to the file: `vi group_vars/prod.yml` to specify the name of the archived plugin file to download:
+     
+         `s3_filename_specific_themes: "backup_2023-12-09-171502Z_EAZYTraining_7ybgX73bqz_twentytwenty_1.1.zip"`
+
+     - And this file will be stored in the `s3_specific_theme_restore` directory on the customer's site.
   
--  Se rendre dans le repertoire: `/home/user/Role-wordpress`
-- Taper la commande: 
+- Go to the directory: `/home/user/Role-wordpress`.
+- Type the command: 
          `ansible-playbook -i hosts.yml --ask-vault-pass -vvv wordpress_operations.yml --tags restore_specific_themes_s3`
 
 
 ## Version 4
 
-- Backup globale sur google drive, S3
-- Restauration globale sur google drive, S3
+- Global backup on google drive, S3
+- Global restore on google drive, S3
 
-### Procédure d'exécution:
+### Execution procedure:
 
-#### Backup Globale sur le bucket s3
-   Se rassurer que les repertoires suivant sont créés chez le client: 
+#### Global Backup on bucket s3
+   Make sure the following directories are created on the customer's site: 
          global_backup_site; global_backup_db; global_backup_plugins; global_backup_themes.
 
-1. Backup globale sur le bucket s3 (de tout le site)
+1. Global backup on the s3 bucket (of the entire site)
          
-      -   Se rendre dans le repertoire: `cd /home/user/Role-wordpress`
-      - Taper la commande: 
+      - Go to directory: `cd /home/user/Role-wordpress`.
+      - Type the command: 
       
          `ansible-playbook -i hosts.yml --ask-vault-pass -vvv wordpress_operations.yml --tags backup_site_s3` 
          
-      - Se rendre sur le bucket de la console aws et choisir le nom du bucket où le backup a été fait pour consulter le fichier globale zippé sous cette forme: 
+      - Go to the bucket in the aws console and select the name of the bucket where the backup was made to view the zipped global file in this form: 
    `backup_2023-11-29-150808Z_EAZYTraining_RJ80HnU9RO_global.zip`
 
-2. Backup de la base de données sur le bucket s3
+2. Backing up the database on the s3 bucket
 
-      -   Se rendre dans le repertoire: `ls /home/user/Role-wordpress`
-      - Taper la commande: 
+      - Go to directory: `ls /home/user/Role-wordpress`.
+      - Type the command: 
       
          `ansible-playbook -i hosts.yml --ask-vault-pass -vvv wordpress_operations.yml --tags backup_db_s3` 
          
-      - Se rendre sur le bucket de la console aws et choisir le nom du bucket où le backup a été fait pour consulter le fichier globale zippé sous cette forme: 
+      - Go to the bucket in the aws console and choose the name of the bucket where the backup was made to view the zipped global file in this form: 
     `backup_2023-11-29-150808Z_EAZYTraining_RJ80HnU9RO_global_db.sql`
 
-3. Backup globale de tous les plugins sur le bucket s3:
+3. Global backup of all plugins on bucket s3:
 
-      -   Se rendre dans le repertoire: `/home/user/Role-wordpress`
-      - Taper la commande: 
+      - Go to the directory: `/home/user/Role-wordpress`.
+      - Type the command: 
       
          `ansible-playbook -i hosts.yml --ask-vault-pass -vvv wordpress_operations.yml --tags s3_global_plugins_backup` 
          
-      - Se rendre sur le bucket de la console aws et choisir le nom du bucket où le backup a été fait pour consulter le fichier globale zippé sous cette forme: 
+      - Go to the bucket in the aws console and choose the name of the bucket where the backup was made to view the zipped global file in this form: 
     `backup_2023-11-29-151045Z_EAZYTraining_JJlXbmRtxY_plugins.zip`
 
-4. Backup globale de tous les themes sur le bucket s3:
+4. Global backup of all themes on the s3 bucket:
 
-      -   Se rendre dans le repertoire: `cd /home/user/Role-wordpress`
-      - Taper la commande: 
+      - Go to directory: `cd /home/user/Role-wordpress`.
+      - Type the command: 
          `ansible-playbook -i hosts.yml --ask-vault-pass -vvv wordpress_operations.yml --tags s3_global_themes_backup` 
          
-      - Se rendre sur le bucket de la console aws et choisir le nom du bucket où le backup a été fait pour consulter le fichier globale zippé sous cette forme: 
+      - Go to the bucket in the aws console and choose the name of the bucket where the backup was made to view the zipped global file in this form: 
+
+
     `backup_2023-11-29-151307Z_EAZYTraining_DivZbqEMYk_themes.zip`
 
-#### Restauration Globale sur le bucket s3
-   Se rassurer que les repertoires suivant sont créés chez le client: 
+#### Global restore to s3 bucket
+   Make sure that the following directories are created on the customer's site: 
          s3_site_restore; s3_db_restore; s3_global_plugin_restore; s3_global_theme_restore.
 
-1. Restauration  globale à partir du bucket s3 (de tout le site)
+1. Global restore from s3 bucket (site-wide)
 
-    a. Télécharger le fichier zipper du site à restaurer dans le repertoire `s3_site_restore`
+    a. Download the zipped file of the site to be restored into the directory `s3_site_restore`.
       
-      - Se rendre dans le fichier :
+      - Go to file :
    
-         `vi roles/wordpress/default/main.yml`
+         `vi group_vars/prod.yml`
 
-           Pour spécifier le fichier archivé du site à restaurer :
+           To specify the archived file for the site to be restored:
            
            `s3_filename_site: "backup_2023-12-11-154653Z_EAZYTraining_PppBXRbPPy_global.zip"`
          
-      b. Restaurer le site en recuperant l'archive dans le repertoire `s3_site_restore`
+      b. Restore the site by retrieving the archive from the `s3_site_restore` directory
   
-   -   Se rendre dans le repertoire: `/home/user/Role-wordpress`
-      - Taper la commande: 
+   - Go to directory: `/home/user/Role-wordpress`.
+      - Type the command: 
       
          `ansible-playbook -i hosts.yml --ask-vault-pass -vvv wordpress_operations.yml --tags restore_site_s3`
 
-2. Restauration  de la base de données à partir du bucket s3
+2. Restoring the database from the s3 bucket
 
-      a. Télécharger le fichier zipper de la base de données à restaurer dans le repertoire `s3_db_restore`
+      a. Download the zipped database file to be restored into the `s3_db_restore` directory.
       
-      - Se rendre dans le fichier :
+      - Go to file :
    
-         `vi roles/wordpress/default/main.yml`
+         `vi group_vars/prod.yml`
 
-           Pour spécifier le fichier archivé du site à restaurer :
+           To specify the site archive file to be restored:
            
            `s3_filename_db: "backup_2023-12-08-120021Z_EAZYTraining_HNXXlsUKhE_global_db.sql"`
-         
-      b. Restaurer la bd en recuperant l'archive dans le repertoire `s3_db_restore`
+
+   
+      b. Restore the site by retrieving the archive from the `s3_site_restore` directory
   
-   -   Se rendre dans le repertoire: `/home/user/Role-wordpress`
-      - Taper la commande: 
+   - Go to directory: `/home/user/Role-wordpress`.
+      - Type the command: 
+      
+         `ansible-playbook -i hosts.yml --ask-vault-pass -vvv wordpress_operations.yml --tags restore_site_s3`
+
+
+2. Restoring the database from the s3 bucket
+
+      a. Download the zipped database file to be restored into the `s3_db_restore` directory.
+      
+      - Go to file :
+
+         
+      b. Restore the database by retrieving the archive from the directory `s3_db_restore`.
+  
+   - Go to the directory: `/home/user/Role-wordpress`.
+      - Type the command: 
       
          `ansible-playbook -i hosts.yml --ask-vault-pass -vvv wordpress_operations.yml --tags restore_db_s3`
          
-3. Restauration globale de tous les plugins à partir du bucket s3
+3. Global restoration of all plugins from the s3 bucket
 
-      a. Télécharger le fichier zipper des plugins à restaurer dans le repertoire `s3_global_plugin_restore`
+      a. Download the zipped file of plugins to be restored into the `s3_global_plugin_restore` directory.
       
-      - Se rendre dans le fichier :
+      - Go to file :
    
-         `vi roles/wordpress/default/main.yml`
+         `vi group_vars/prod.yml`
 
-           Pour spécifier le fichier archivé du site à restaurer :
+           To specify the site archive file to be restored:
            
            `s3_filename_plugins: "backup_2023-12-08-122719Z_EAZYTraining_haEVITTfu9_plugins.zip"`
          
-      b. Restaurer les plugins en recuperant l'archive dans le repertoire `s3_global_plugin_restore`
+      b. Restore plugins by retrieving the archive from the directory `s3_global_plugin_restore`.
   
-   -   Se rendre dans le repertoire: `/home/user/Role-wordpress`
-      - Taper la commande: 
-      
+   - Go to directory: `/home/user/Role-wordpress`.
+      - Type the command:
+           
          `ansible-playbook -i hosts.yml --ask-vault-pass -vvv wordpress_operations.yml --tags restore_plugins_s3`
 
-4. Restauration globale de tous les themes à partir du bucket s3
+4. Global restoration of all themes from the s3 bucket
 
  
-      a. Télécharger le fichier zipper des plugins à restaurer dans le repertoire `s3_global_theme_restore`
+      a. Download the zipped file of plugins to be restored into the `s3_global_theme_restore` directory.
       
-      - Se rendre dans le fichier :
+      - Go to file :
    
-         `vi roles/wordpress/default/main.yml`
+         `vi group_vars/prod.yml`
 
-           Pour spécifier le fichier archivé du site à restaurer :
+           To specify the site archive file to be restored:
            
            `s3_filename_themes: "backup_2023-12-08-132228Z_EAZYTraining_RuOWL6ErRk_themes.zip"`
          
-      b. Restaurer les plugins en recuperant l'archive dans le repertoire `s3_global_theme_restore`
+      b. Restore plugins by retrieving the archive from the `s3_global_theme_restore` directory
   
-   -   Se rendre dans le repertoire: `/home/user/Role-wordpress`
-      - Taper la commande: 
+   - Go to directory: `/home/user/Role-wordpress`.
+      - Type the command: 
       
          `ansible-playbook -i hosts.yml --ask-vault-pass -vvv wordpress_operations.yml --tags restore_themes_s3`
 
 ## Version 5
 
-- intégration de molecule
-- Intégration des  pré-commit hooks
+- molecule integration
+- Pre-commit hooks integration
 
-##  Version 6
+## Version 6
 
-- libraison du rôle sur la galaxie
+- galaxy role release
