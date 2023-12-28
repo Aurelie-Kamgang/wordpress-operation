@@ -19,6 +19,7 @@ Prerequisites:
  1. Deploy EAZYtraining application:
 	  - Git clone repos
       - Go to the directory: `cd /home/user/Role-wordpress`.
+      - retrieve the role from the requirements.yml file with the command: `ansible-galaxy install roles/requirements.yml`
       - Type the command: 
       `ansible-playbook -i hosts.yml --ask-vault-pass -vvv wordpress_operations.yml --tags deploy`
 
