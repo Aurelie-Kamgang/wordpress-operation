@@ -1,3 +1,3 @@
 ---
 # Install a role for wordpress
-- src: git@github.com:eazytraining/role-wordpress.git
+- src: https://github.com/eazytraining/role-wordpress.git
