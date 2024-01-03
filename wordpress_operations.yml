@@ -15,4 +15,4 @@
         - zip
 
   roles:
-    - { role: Role-wordpress } 
+    - { role: role-wordpress } 
