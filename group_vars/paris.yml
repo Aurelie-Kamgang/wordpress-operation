@@ -3,7 +3,7 @@ ansible_user: centos
 ansible_password: "{{ vault_ansible_password }}"
 
 # defaults file for roles
-system_user: centos
+system_user: cloud_user
 compose_project_dir: /home/{{ system_user }}/site-vitrine/wordpress-backup
 
 db_container_name: site-vitrine-db
@@ -64,7 +64,7 @@ s3_remote_directory_site: "global_backup_site"
 
 # plugins_to_install
 plugins_to_install:
-  - akismet
+  - malcare-security
 
 # plugins_to_activate
 plugins_to_activate:
