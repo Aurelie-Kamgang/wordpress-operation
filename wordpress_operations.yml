@@ -1,6 +1,6 @@
 ---
 - name: Deploy WordPress with Docker Compose
-  hosts: prod
+  hosts: paris
   become: true
   vars_files:
     - files/secrets/credentials.yml
