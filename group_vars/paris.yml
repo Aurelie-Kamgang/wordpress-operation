@@ -65,6 +65,9 @@ s3_remote_directory_site: "global_backup_site"
 # plugins_to_install
 plugins_to_install:
   - malcare-security
+  - w3-total-cache
+  - redis-cache
+  - learnpress
 
 # plugins_to_activate
 plugins_to_activate:
@@ -74,7 +77,7 @@ plugins_to_activate:
 
 # plugins_to_uninstall
 plugins_to_uninstall:
-  - akismet
+  - redis-cache
   # - //**/ hello commntaire
   #sdfsdfsdfsdf
 
@@ -92,7 +95,7 @@ themes_to_install:
 
 # themes_to_activate
 themes_to_activate:
-  - medazin
+ - oceanwp
 
 # themes_to_uinstall
 themes_to_uninstall:
