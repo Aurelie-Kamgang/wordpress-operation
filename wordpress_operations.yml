@@ -14,4 +14,4 @@
         - git
         - zip
   roles:
-    - role-wordpress 
+  - role-wordpress 
