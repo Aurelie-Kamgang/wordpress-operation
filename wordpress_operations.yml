@@ -13,5 +13,5 @@
         - wget
         - git
         - zip
-roles:
-  - role-wordpress
+  roles:
+    -  role: role-wordpress 
