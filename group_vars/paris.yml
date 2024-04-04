@@ -64,7 +64,8 @@ s3_remote_directory_site: "global_backup_site"
 
 # plugins_to_install
 plugins_to_install:
-  #- malcare-security
+  - akismet
+  - malcare-security
   - w3-total-cache
   - redis-cache
   - learnpress
