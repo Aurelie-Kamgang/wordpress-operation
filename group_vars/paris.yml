@@ -4,6 +4,7 @@ ansible_password: "{{ vault_ansible_password }}"
 
 # defaults file for roles
 system_user: cloud_user
+system_group: cloud_user
 compose_project_dir: /home/{{ system_user }}/site-vitrine/wordpress-backup
 
 db_container_name: site-vitrine-db
