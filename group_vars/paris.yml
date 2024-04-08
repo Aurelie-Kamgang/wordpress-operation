@@ -112,7 +112,7 @@ new_theme_to_activate: twentytwentyfour # lorsqu'on voudra désactiver un théme
 # plugin_to_update
 plugin_to_update:
   plugin_name: "learnpress"
-  new_version: 4.2.6.2
+  new_version: 4.2.6.1
 
 # theme_to_update
 theme_to_update:
