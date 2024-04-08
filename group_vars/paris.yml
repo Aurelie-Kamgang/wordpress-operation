@@ -96,7 +96,7 @@ themes_to_install:
 
 # themes_to_activate
 themes_to_activate:
- - oceanwp
+ - twentytwenty
 
 # themes_to_uinstall
 themes_to_uninstall:
