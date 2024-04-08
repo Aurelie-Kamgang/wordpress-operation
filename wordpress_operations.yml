@@ -15,4 +15,4 @@
         - zip
 
   roles:
-    - role-wordpress
+    - { role: role-wordpress-hook } 
